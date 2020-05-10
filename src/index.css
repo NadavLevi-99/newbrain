@@ -5,8 +5,16 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
+  /* background-color: #21D4FD; */
+  background-image: linear-gradient(19deg, #21D4FD 0%, #B721FF 100%);
+  background-repeat: no-repeat;
+  font-family: 'Segoe UI'  ,'Courier New', Courier, monospace;
 
+}
+html, 
+body {
+    height: 100%;
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
