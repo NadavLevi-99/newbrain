@@ -1,7 +1,11 @@
-.rank {
+.center {
   display: flex;
   justify-content: center;
   align-content: center;
+}
+.wrapnav{
+    display: flex;
+    flex-wrap: wrap;
 }
 .imagelinktext {
     display:'flex';

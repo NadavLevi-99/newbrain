@@ -5,12 +5,15 @@ import Rank from './componnents/Rank';
 import FaceRec from './componnents/FaceRec/FaceRec';
 import './App.css';
 import Particles from 'react-particles-js';
+import SignIn from './componnents/SignIn';
+import Register from './componnents/Register';
 
-const Clarifai = require('clarifai');
-      
+
+const Clarifai = require('clarifai');     
 // Instantiate a new Clarifai app by passing in your API key.
 const app = new Clarifai.App({apiKey: '867cbc9dfc044364a4ed93128a3cbf54'});
 
+//creating the background particels in the app.
 const particelsOptions ={
 particles: {
       value:40,
@@ -30,10 +33,12 @@ constructor(){
     imageurl:'',
     famousname:'',
     box: [{}],
-    personDetails:""
+    personDetails:{},
+    route:'signin'
   }
 }
 
+//uses the api data to calculate te box around the faces and to put the person data into the state object(personD)
 calculateFaceLocation = (data) => {
   const output = data.outputs[0].data;
   let personDetails = {};
@@ -48,8 +53,6 @@ calculateFaceLocation = (data) => {
     }
 
   }
-  console.log(personDetails)
-  console.log(data);
   const boundingarray = data.outputs[0].data.regions.map(r =>  {
     return (
       {
@@ -62,11 +65,10 @@ calculateFaceLocation = (data) => {
   });
   return {
           box:boundingarray , 
-          pepoleD: personDetails
+          personD: personDetails
          } 
 
 }
-
 //apiceleb cant update state
 apiceleb = (url) => {
   app.models.predict("e466caa0619f444ab97497640cefc4dc", url).then(
@@ -83,14 +85,12 @@ apiceleb = (url) => {
 onInputChange = (event) => {
   this.setState({input: event.target.value });
 }
-
-
+//set the changes of calculateFaceLocation
 displayfacebox = (obj) => {
   this.setState({box: obj.box});
-  this.setState({personDetails: `We estimate the person in the picture details as followes: age- ${obj.pepoleD.age} , gender- ${obj.pepoleD.gender} , demogrhafics- ${obj.pepoleD.demogrhafics}`}); 
+  this.setState({personDetails: obj.personD});
 }
-
-
+// on the imagelinkform butoon click calls the api call
 onButtonClick = () => {
    this.setState({imageUrl: this.state.input});
   app.models.predict("c0c0ac362b03416da06ab3fa36fb58e3", this.state.input)
@@ -102,20 +102,37 @@ onButtonClick = () => {
   // .catch(err => alert("image url can't be reached, try to use different image or address"));
 
 }
+onRouteChange = (route) => {
+ this.setState({route:route});
+}
 render(){
+  //routing is setting the app page by the routing parameter.
+  const routing = () => {
+    switch(this.state.route) 
+    {
+      case 'signin':
+        return(<> <SignIn onRouteChange={this.onRouteChange}/> </>);
+      case 'home':
+        return (
+          <>
+        <Rank personDetails={this.state.personDetails} famousname={this.famousname}/>
+        <ImageLinkForm onButtonClick={this.onButtonClick} onInputChange={this.onInputChange}/>
+        <FaceRec  box={this.state.box} imgurl={this.state.input}/>
+         </>
+        );
+      case 'register':
+        return (<> <Register onRouteChange={this.onRouteChange}/> </>);
+      default: return(<div></div>);
+    }
+  }
   return(
     <div>
       <Particles className='particels' params={particelsOptions}/>
-      <Navigation/>
-      <Rank personDetails={this.state.personDetails} famousname={this.famousname}/>
-      <ImageLinkForm onButtonClick={this.onButtonClick} onInputChange={this.onInputChange}/>
-      <FaceRec  box={this.state.box} imgurl={this.state.input}/>
+      <Navigation route={this.state.route} onRouteChange={this.onRouteChange} />
+      {routing()}
     </div>
   );
 }
 }
     
-
-
-
 export default App;
