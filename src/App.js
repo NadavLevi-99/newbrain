@@ -34,10 +34,34 @@ constructor(){
     famousname:'',
     box: [{}],
     personDetails:{},
-    route:'signin'
+    route:'signin',
+    user:{
+      id: '',
+      name: '',
+      email: '',
+      password:'',
+      enteries:'',    
+      joined: ''
+    }
   }
 }
 
+componentDidMount(){
+  fetch("http://localhost:3000/")
+  .then(response => response.json())
+   .then(console.log);
+}
+
+loaduser = (data) => {
+  this.setState({user: {
+    id: data.id,
+    name: data.name,
+    email: data.email,
+    password:data.password,
+    enteries:data.enteries,
+    joined:data.joined
+  }})
+} 
 //uses the api data to calculate te box around the faces and to put the person data into the state object(personD)
 calculateFaceLocation = (data) => {
   const output = data.outputs[0].data;
@@ -111,17 +135,17 @@ render(){
     switch(this.state.route) 
     {
       case 'signin':
-        return(<> <SignIn onRouteChange={this.onRouteChange}/> </>);
+        return(<> <SignIn loaduser={this.loaduser} onRouteChange={this.onRouteChange}/> </>);
       case 'home':
         return (
           <>
-        <Rank personDetails={this.state.personDetails} famousname={this.famousname}/>
+        <Rank user={this.state.user} personDetails={this.state.personDetails} famousname={this.famousname}/>
         <ImageLinkForm onButtonClick={this.onButtonClick} onInputChange={this.onInputChange}/>
         <FaceRec  box={this.state.box} imgurl={this.state.input}/>
          </>
         );
       case 'register':
-        return (<> <Register onRouteChange={this.onRouteChange}/> </>);
+        return (<> <Register loaduser={this.loaduser} onRouteChange={this.onRouteChange}/> </>);
       default: return(<div></div>);
     }
   }
